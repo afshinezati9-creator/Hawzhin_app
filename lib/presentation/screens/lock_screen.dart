@@ -501,6 +501,7 @@ class _LockScreenState extends State<LockScreen>
           ),
         ),
       ),
+    ),
     );
   }
 
