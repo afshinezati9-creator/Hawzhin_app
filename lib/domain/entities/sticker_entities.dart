@@ -39,35 +39,49 @@ class StickerTask extends Equatable {
   final String id;
   final String text;
   final bool done;
+  final bool inProgress;
 
   const StickerTask({
     required this.id,
     required this.text,
     this.done = false,
+    this.inProgress = false,
   });
 
-  StickerTask copyWith({String? id, String? text, bool? done}) {
+  /// وضعیت‌ها: عادی، در حال انجام، انجام‌شده. داده‌های قدیمیِ done هم حفظ می‌شوند.
+  StickerTask copyWith({String? id, String? text, bool? done, bool? inProgress}) {
     return StickerTask(
       id: id ?? this.id,
       text: text ?? this.text,
       done: done ?? this.done,
+      inProgress: inProgress ?? this.inProgress,
     );
+  }
+
+  StickerTask nextStatus() {
+    if (done) return copyWith(done: false, inProgress: false);
+    if (inProgress) return copyWith(done: true, inProgress: false);
+    return copyWith(done: false, inProgress: true);
   }
 
   Map<String, dynamic> toMap() => {
         'id': id,
         'text': text,
         'done': done,
+        'inProgress': inProgress,
       };
 
   factory StickerTask.fromMap(Map<String, dynamic> m) => StickerTask(
         id: m['id'] as String? ?? '',
         text: m['text'] as String? ?? '',
         done: m['done'] as bool? ?? false,
+        inProgress: (m['done'] as bool? ?? false)
+            ? false
+            : (m['inProgress'] as bool? ?? false),
       );
 
   @override
-  List<Object?> get props => [id, text, done];
+  List<Object?> get props => [id, text, done, inProgress];
 }
 
 class StickerNote extends Equatable {
