@@ -161,6 +161,12 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
     super.dispose();
   }
 
+  TextDirection _directionForText(String text) {
+    if (RegExp(r'[\u0600-\u06FF]').hasMatch(text)) return TextDirection.rtl;
+    if (RegExp(r'[A-Za-z]').hasMatch(text)) return TextDirection.ltr;
+    return TextDirection.rtl;
+  }
+
   String _bodyJson() => jsonEncode(_quill.document.toDelta().toJson());
 
   Future<void> _save({bool pop = true, bool silent = false}) async {
@@ -1029,6 +1035,8 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
         children: [
           TextField(
             controller: _titleCtrl,
+            textDirection: _directionForText(_titleCtrl.text),
+            onChanged: (_) => setState(() {}),
             style: theme.textTheme.headlineMedium
                 ?.copyWith(fontWeight: FontWeight.w700),
             decoration: const InputDecoration(
