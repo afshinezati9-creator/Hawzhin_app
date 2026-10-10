@@ -147,21 +147,8 @@ class BiometricService {
           e.code == auth_error.passcodeNotSet) {
         return false;
       }
-      if (biometricOnly) {
-        try {
-          return await _auth.authenticate(
-            localizedReason: reason,
-            options: const AuthenticationOptions(
-              biometricOnly: false,
-              stickyAuth: true,
-              useErrorDialogs: true,
-              sensitiveTransaction: false,
-            ),
-          );
-        } catch (_) {
-          return false;
-        }
-      }
+      // When the caller requires biometrics, never silently fall back to the
+      // device PIN/password: report failure so the app can offer its own PIN.
       return false;
     } catch (e) {
       // ignore: avoid_print
