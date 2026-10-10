@@ -455,8 +455,8 @@ class _LockScreenState extends State<LockScreen>
                         );
                       }),
                     ),
+                      ),
                   ),
-                    ),
                 ),
                 if (_error != null) ...[
                   const SizedBox(height: 14),
