@@ -179,12 +179,12 @@ class StickerNoteCard extends StatelessWidget {
                                 children: [
                                   Icon(
                                     t.done
-                                        ? Icons.check_box_rounded
-                                        : Icons.check_box_outline_blank_rounded,
+                                        ? Icons.check_circle_rounded
+                                        : (t.inProgress ? Icons.more_horiz_rounded : Icons.close_rounded),
                                     size: 14,
                                     color: t.done
-                                        ? const Color(0xFF22C55E)
-                                        : muted,
+                                        ? const Color(0xFF16A34A)
+                                        : (t.inProgress ? muted : const Color(0xFFDC2626)),
                                   ),
                                   const SizedBox(width: 6),
                                   Expanded(
