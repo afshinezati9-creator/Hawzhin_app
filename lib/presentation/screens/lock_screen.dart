@@ -501,7 +501,7 @@ class _LockScreenState extends State<LockScreen>
           ),
         ),
       ),
-    ),
+    );
   }
 
   Widget _pad(ThemeData theme) {
