@@ -2,11 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/money_format.dart';
+import '../../../core/utils/jalali.dart';
+import '../../widgets/shamsi_date_picker.dart';
 import '../../../core/widgets/app_loading.dart';
 import '../../../domain/entities/sticker_entities.dart';
 import '../../providers/stickers_provider.dart';
 import 'sticker_note_card.dart';
 import 'surface_background.dart';
+
+TextDirection _directionForText(String text) {
+  if (RegExp(r'[\\u0600-\\u06FF]').hasMatch(text)) return TextDirection.rtl;
+  if (RegExp(r'[A-Za-z]').hasMatch(text)) return TextDirection.ltr;
+  return TextDirection.rtl;
+}
 
 IconData _iconData(String id) {
   switch (id) {
@@ -61,6 +69,7 @@ class StickersScreen extends ConsumerWidget {
     final titleCtrl = TextEditingController();
     String color = 'yellow';
     String icon = 'check';
+    DateTime? dueDate;
 
     final ok = await showModalBottomSheet<bool>(
       context: context,
@@ -92,8 +101,25 @@ class StickersScreen extends ConsumerWidget {
                       labelText: 'عنوان',
                       hintText: 'مثلاً خرید خانه',
                     ),
+                    textDirection: _directionForText(titleCtrl.text),
+                    onChanged: (_) => setLocal(() {}),
                     autofocus: true,
                   ),
+                  const SizedBox(height: 8),
+                  OutlinedButton.icon(
+                    onPressed: () async {
+                      final picked = await showShamsiDatePicker(ctx, initial: dueDate ?? DateTime.now());
+                      if (picked != null) setLocal(() => dueDate = picked);
+                    },
+                    icon: const Icon(Icons.event_outlined),
+                    label: Text(dueDate == null ? 'افزودن تاریخ شمسی (اختیاری)' : 'مهلت: ${Jalali.fromDateTime(dueDate!).format(withMonthName: true)}'),
+                  ),
+                  if (dueDate != null)
+                    Align(alignment: Alignment.centerLeft, child: TextButton.icon(
+                      onPressed: () => setLocal(() => dueDate = null),
+                      icon: const Icon(Icons.close, size: 16),
+                      label: const Text('حذف تاریخ'),
+                    )),
                   const SizedBox(height: 8),
                   const Text('رنگ', style: TextStyle(fontWeight: FontWeight.w800)),
                   const SizedBox(height: 6),
@@ -204,6 +230,7 @@ class StickersScreen extends ConsumerWidget {
           : titleCtrl.text.trim(),
       color: color,
       icon: icon,
+      dueDate: dueDate,
     );
     await ref.read(stickersProvider.notifier).addNote(current.id, note);
   }
@@ -1074,6 +1101,7 @@ class _ChecklistSheet extends ConsumerStatefulWidget {
 
 class _ChecklistSheetState extends ConsumerState<_ChecklistSheet> {
   final _taskCtrl = TextEditingController();
+  TextDirection _taskDirection = TextDirection.rtl;
 
   StickerNote? get _note {
     final s = ref.watch(stickersProvider).surfaces;
@@ -1110,6 +1138,7 @@ class _ChecklistSheetState extends ConsumerState<_ChecklistSheet> {
           note.copyWith(tasks: [...note.tasks, task]),
         );
     _taskCtrl.clear();
+    if (mounted) setState(() => _taskDirection = TextDirection.rtl);
   }
 
   Future<void> _deleteTask(StickerTask t) async {
@@ -1131,6 +1160,7 @@ class _ChecklistSheetState extends ConsumerState<_ChecklistSheet> {
     final titleCtrl = TextEditingController(text: note.title);
     var color = note.color;
     var icon = note.icon;
+    DateTime? dueDate = note.dueDate;
     final ok = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
@@ -1154,7 +1184,24 @@ class _ChecklistSheetState extends ConsumerState<_ChecklistSheet> {
                 TextField(
                   controller: titleCtrl,
                   decoration: const InputDecoration(labelText: 'عنوان'),
+                  textDirection: _directionForText(titleCtrl.text),
+                  onChanged: (_) => setLocal(() {}),
                 ),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: () async {
+                    final picked = await showShamsiDatePicker(ctx, initial: dueDate ?? DateTime.now());
+                    if (picked != null) setLocal(() => dueDate = picked);
+                  },
+                  icon: const Icon(Icons.event_outlined),
+                  label: Text(dueDate == null ? 'افزودن تاریخ شمسی (اختیاری)' : 'مهلت: ${Jalali.fromDateTime(dueDate!).format(withMonthName: true)}'),
+                ),
+                if (dueDate != null)
+                  Align(alignment: Alignment.centerLeft, child: TextButton.icon(
+                    onPressed: () => setLocal(() => dueDate = null),
+                    icon: const Icon(Icons.close, size: 16),
+                    label: const Text('حذف تاریخ'),
+                  )),
                 const SizedBox(height: 12),
                 const Text('رنگ', style: TextStyle(fontWeight: FontWeight.w800)),
                 const SizedBox(height: 8),
@@ -1220,6 +1267,8 @@ class _ChecklistSheetState extends ConsumerState<_ChecklistSheet> {
                 : titleCtrl.text.trim(),
             color: color,
             icon: icon,
+            dueDate: dueDate,
+            clearDueDate: dueDate == null,
           ),
         );
   }
@@ -1356,6 +1405,8 @@ class _ChecklistSheetState extends ConsumerState<_ChecklistSheet> {
                         hintText: 'کار جدید…',
                         isDense: true,
                       ),
+                      textDirection: _taskDirection,
+                      onChanged: (value) => setState(() => _taskDirection = _directionForText(value)),
                       onSubmitted: (_) => _addTask(),
                     ),
                   ),
