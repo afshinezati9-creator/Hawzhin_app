@@ -162,8 +162,16 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
   }
 
   TextDirection _directionForText(String text) {
-    if (RegExp(r'[\u0600-\u06FF]').hasMatch(text)) return TextDirection.rtl;
-    if (RegExp(r'[A-Za-z]').hasMatch(text)) return TextDirection.ltr;
+    for (final rune in text.runes) {
+      if ((rune >= 0x0600 && rune <= 0x06FF) ||
+          (rune >= 0xFB50 && rune <= 0xFEFF)) {
+        return TextDirection.rtl;
+      }
+      if ((rune >= 0x41 && rune <= 0x5A) ||
+          (rune >= 0x61 && rune <= 0x7A)) {
+        return TextDirection.ltr;
+      }
+    }
     return TextDirection.rtl;
   }
 
@@ -998,21 +1006,25 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
         children: [
           if (!_fullscreen) _buildMetaHeader(theme),
           Expanded(
-            child: QuillEditor.basic(
-              controller: _quill,
-              focusNode: _editorFocus,
-              scrollController: _editorScrollCtrl,
-              config: QuillEditorConfig(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
-                placeholder: 'شروع به نوشتن کنید...',
-                autoFocus: widget.isNew,
-                expands: false,
-                scrollable: true,
-                embedBuilders: [
-                  ImageEmbedBuilder(),
-                  AudioEmbedBuilder(),
-                  TableEmbedBuilder(),
-                ],
+            child: Directionality(
+              // جهت پیش‌فرض متن را با اولین حرف معنی‌دار نوشته هماهنگ می‌کند.
+              textDirection: _directionForText(_quill.document.toPlainText()),
+              child: QuillEditor.basic(
+                controller: _quill,
+                focusNode: _editorFocus,
+                scrollController: _editorScrollCtrl,
+                config: QuillEditorConfig(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
+                  placeholder: 'شروع به نوشتن کنید...',
+                  autoFocus: widget.isNew,
+                  expands: false,
+                  scrollable: true,
+                  embedBuilders: [
+                    ImageEmbedBuilder(),
+                    AudioEmbedBuilder(),
+                    TableEmbedBuilder(),
+                  ],
+                ),
               ),
             ),
           ),
