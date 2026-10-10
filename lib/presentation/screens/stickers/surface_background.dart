@@ -225,7 +225,7 @@ class _Painter extends CustomPainter {
 
   void _paper(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = (light ? Colors.black : Colors.white).withOpacity(0.03)
+      ..color = (light ? Colors.black : Colors.white).withOpacity(0.075)
       ..strokeWidth = 1;
     for (var y = 28.0; y < size.height; y += 22) {
       canvas.drawLine(Offset(16, y), Offset(size.width - 16, y), paint);
@@ -234,7 +234,7 @@ class _Painter extends CustomPainter {
 
   void _dots(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = (light ? Colors.black : Colors.white).withOpacity(0.04);
+      ..color = (light ? Colors.black : Colors.white).withOpacity(0.085);
     for (var y = 12.0; y < size.height; y += 18) {
       for (var x = 12.0; x < size.width; x += 18) {
         canvas.drawCircle(Offset(x, y), 1.2, paint);
@@ -254,7 +254,7 @@ class _Painter extends CustomPainter {
 
   void _waves(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = (light ? const Color(0xFF0369A1) : Colors.white).withOpacity(0.08)
+      ..color = (light ? const Color(0xFF0369A1) : Colors.white).withOpacity(0.14)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
     for (var i = 0; i < 8; i++) {
@@ -272,7 +272,7 @@ class _Painter extends CustomPainter {
     final paint = Paint()..style = PaintingStyle.fill;
     for (var i = 0; i < 40; i++) {
       paint.color = (light ? const Color(0xFF166534) : const Color(0xFF86EFAC))
-          .withOpacity(0.06 + rnd.nextDouble() * 0.05);
+          .withOpacity(0.10 + rnd.nextDouble() * 0.07);
       final x = rnd.nextDouble() * size.width;
       final y = rnd.nextDouble() * size.height;
       final path = Path()
