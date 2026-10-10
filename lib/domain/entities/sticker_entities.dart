@@ -79,6 +79,7 @@ class StickerNote extends Equatable {
   final bool archived;
   final String archiveNote;
   final DateTime? archivedAt;
+  final DateTime? dueDate;
 
   const StickerNote({
     required this.id,
@@ -89,6 +90,7 @@ class StickerNote extends Equatable {
     this.archived = false,
     this.archiveNote = '',
     this.archivedAt,
+    this.dueDate,
   });
 
   int get doneCount => tasks.where((t) => t.done).length;
@@ -105,6 +107,8 @@ class StickerNote extends Equatable {
     String? archiveNote,
     DateTime? archivedAt,
     bool clearArchivedAt = false,
+    DateTime? dueDate,
+    bool clearDueDate = false,
   }) {
     return StickerNote(
       id: id ?? this.id,
@@ -115,6 +119,7 @@ class StickerNote extends Equatable {
       archived: archived ?? this.archived,
       archiveNote: archiveNote ?? this.archiveNote,
       archivedAt: clearArchivedAt ? null : (archivedAt ?? this.archivedAt),
+      dueDate: clearDueDate ? null : (dueDate ?? this.dueDate),
     );
   }
 
@@ -127,6 +132,7 @@ class StickerNote extends Equatable {
         'archived': archived,
         'archiveNote': archiveNote,
         'archivedAt': archivedAt?.toIso8601String(),
+        'dueDate': dueDate?.toIso8601String(),
       };
 
   factory StickerNote.fromMap(Map<String, dynamic> m) {
@@ -142,12 +148,13 @@ class StickerNote extends Equatable {
       archived: m['archived'] as bool? ?? false,
       archiveNote: m['archiveNote'] as String? ?? '',
       archivedAt: DateTime.tryParse(m['archivedAt'] as String? ?? ''),
+      dueDate: DateTime.tryParse(m['dueDate'] as String? ?? ''),
     );
   }
 
   @override
   List<Object?> get props =>
-      [id, title, color, icon, tasks, archived, archiveNote, archivedAt];
+      [id, title, color, icon, tasks, archived, archiveNote, archivedAt, dueDate];
 }
 
 class StickerSurface extends Equatable {
