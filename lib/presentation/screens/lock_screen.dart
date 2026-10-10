@@ -269,10 +269,14 @@ class _LockScreenState extends State<LockScreen>
 
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-          child: Column(
-            children: [
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Column(
+                  children: [
               const Spacer(flex: 2),
               // لوگوی قفل
               Container(
@@ -485,8 +489,11 @@ class _LockScreenState extends State<LockScreen>
                     child: CircularProgressIndicator(strokeWidth: 2),
                   ),
               ],
-              const SizedBox(height: 8),
-            ],
+                    const SizedBox(height: 8),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ),
