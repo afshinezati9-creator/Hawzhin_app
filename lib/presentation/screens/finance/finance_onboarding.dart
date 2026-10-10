@@ -141,7 +141,7 @@ class _FinanceOnboardingState extends ConsumerState<FinanceOnboarding> {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const Text('مجموع موجودی اولیه', style: TextStyle(fontWeight: FontWeight.w800)),
             const SizedBox(height: 4),
-            Text('${MoneyFormat.format(total)} تومان', style: theme.textTheme.titleLarge?.copyWith(color: AppColors.brand3, fontWeight: FontWeight.w900)),
+            Text('${MoneyFormat.formatNumber(total)} تومان', style: theme.textTheme.titleLarge?.copyWith(color: AppColors.brand3, fontWeight: FontWeight.w900)),
             if (total > 0) ...[const SizedBox(height: 4), Text(PersianAmountWords.toman(total), style: theme.textTheme.bodySmall)],
           ]),
         ),
