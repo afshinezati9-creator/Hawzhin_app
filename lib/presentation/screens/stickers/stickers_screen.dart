@@ -11,7 +11,7 @@ import 'sticker_note_card.dart';
 import 'surface_background.dart';
 
 TextDirection _directionForText(String text) {
-  if (RegExp(r'[\\u0600-\\u06FF]').hasMatch(text)) return TextDirection.rtl;
+  if (RegExp(r'[\u0600-\u06FF]').hasMatch(text)) return TextDirection.rtl;
   if (RegExp(r'[A-Za-z]').hasMatch(text)) return TextDirection.ltr;
   return TextDirection.rtl;
 }
