@@ -172,16 +172,35 @@ class _Painter extends CustomPainter {
   }
 
   void _wood(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = (light ? Colors.brown : Colors.black).withOpacity(0.07)
-      ..strokeWidth = 1;
-    for (var y = 0.0; y < size.height; y += 14) {
-      final path = Path();
-      path.moveTo(0, y);
-      for (var x = 0.0; x < size.width; x += 40) {
-        path.quadraticBezierTo(x + 20, y + (x.toInt() % 2 == 0 ? 3 : -3), x + 40, y);
+    // رگه‌های چندلایه و نامنظم برای حس چوب واقعی‌تر، با الگوی ثابت و کم‌هزینه.
+    final grain = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+    for (var row = 0; row < (size.height / 7).ceil(); row++) {
+      final y = row * 7.0;
+      grain
+        ..color = (light ? const Color(0xFF68482E) : const Color(0xFFE0B98D))
+            .withOpacity(row.isEven ? 0.055 : 0.025)
+        ..strokeWidth = row % 5 == 0 ? 1.2 : 0.65;
+      final path = Path()..moveTo(0, y);
+      for (var x = 0.0; x < size.width; x += 34) {
+        final bend = math.sin((x / 43) + row * 0.8) * (row % 4 == 0 ? 3.2 : 1.4);
+        path.quadraticBezierTo(x + 17, y + bend, x + 34, y + bend * 0.25);
       }
-      canvas.drawPath(path, paint);
+      canvas.drawPath(path, grain);
+    }
+    // گره‌های ظریف چوب
+    for (final knot in [
+      Offset(size.width * 0.22, size.height * 0.28),
+      Offset(size.width * 0.76, size.height * 0.72),
+    ]) {
+      final knotPaint = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 0.8
+        ..color = (light ? const Color(0xFF68482E) : const Color(0xFFE0B98D))
+            .withOpacity(0.08);
+      canvas.drawOval(Rect.fromCenter(center: knot, width: 30, height: 9), knotPaint);
+      canvas.drawOval(Rect.fromCenter(center: knot, width: 18, height: 4), knotPaint);
     }
   }
 
