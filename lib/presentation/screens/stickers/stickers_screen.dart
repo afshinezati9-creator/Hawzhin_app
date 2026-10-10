@@ -1125,7 +1125,7 @@ class _ChecklistSheetState extends ConsumerState<_ChecklistSheet> {
     final note = _note;
     if (note == null) return;
     final tasks = note.tasks
-        .map((x) => x.id == t.id ? x.copyWith(done: !x.done) : x)
+        .map((x) => x.id == t.id ? x.nextStatus() : x)
         .toList();
     await ref
         .read(stickersProvider.notifier)
@@ -1388,9 +1388,14 @@ class _ChecklistSheetState extends ConsumerState<_ChecklistSheet> {
               const SizedBox(height: 12),
               ...note.tasks.map((t) => ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: Checkbox(
-                      value: t.done,
-                      onChanged: (_) => _toggle(t),
+                    leading: IconButton(
+                      tooltip: t.done ? 'انجام‌شده؛ برای بازنشانی بزن' : (t.inProgress ? 'در حال انجام؛ برای تکمیل بزن' : 'انجام‌نشده؛ برای شروع بزن'),
+                      onPressed: () => _toggle(t),
+                      icon: Icon(
+                        t.done ? Icons.check_circle_rounded : (t.inProgress ? Icons.more_horiz_rounded : Icons.close_rounded),
+                        color: t.done ? const Color(0xFF16A34A) : (t.inProgress ? Theme.of(context).colorScheme.onSurface.withOpacity(0.55) : const Color(0xFFDC2626)),
+                        size: 26,
+                      ),
                     ),
                     title: Text(
                       t.text,
