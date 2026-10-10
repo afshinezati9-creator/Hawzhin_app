@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/utils/money_format.dart';
+import '../../../core/utils/jalali.dart';
 import '../../../domain/entities/sticker_entities.dart';
 
 class StickerNoteCard extends StatelessWidget {
@@ -178,8 +179,8 @@ class StickerNoteCard extends StatelessWidget {
                                 children: [
                                   Icon(
                                     t.done
-                                        ? Icons.check_circle
-                                        : Icons.radio_button_unchecked,
+                                        ? Icons.check_box_rounded
+                                        : Icons.check_box_outline_blank_rounded,
                                     size: 14,
                                     color: t.done
                                         ? const Color(0xFF22C55E)
@@ -209,6 +210,21 @@ class StickerNoteCard extends StatelessWidget {
                           '+${MoneyFormat.toPersianDigits('$extra')} مورد دیگر',
                           style: TextStyle(fontSize: 11, color: muted),
                         ),
+                      if (note.dueDate != null) ...[
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Icon(Icons.event_outlined, size: 12, color: muted),
+                            const SizedBox(width: 4),
+                            Expanded(child: Text(
+                              Jalali.fromDateTime(note.dueDate!).format(withMonthName: true),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontSize: 10, color: muted),
+                            )),
+                          ],
+                        ),
+                      ],
                       const Spacer(),
                       Text(
                         '${MoneyFormat.toPersianDigits('$done')}/${MoneyFormat.toPersianDigits('${note.tasks.length}')} کار',
