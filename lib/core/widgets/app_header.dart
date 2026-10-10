@@ -51,6 +51,19 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
             icon: isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
             onTap: onThemeToggle,
           ),
+          const SizedBox(width: 6),
+          PopupMenuButton<String>(
+            tooltip: 'درباره هاوژین و حمایت',
+            icon: const Icon(Icons.more_vert_rounded),
+            onSelected: (value) {
+              if (value == 'about') _showAbout(context);
+              if (value == 'donate') _showDonation(context);
+            },
+            itemBuilder: (context) => const [
+              PopupMenuItem(value: 'about', child: ListTile(dense: true, leading: Icon(Icons.info_outline_rounded), title: Text('درباره ما'))),
+              PopupMenuItem(value: 'donate', child: ListTile(dense: true, leading: Icon(Icons.favorite_outline_rounded), title: Text('حمایت از توسعه‌دهنده'))),
+            ],
+          ),
           const Spacer(),
           Row(
             mainAxisSize: MainAxisSize.min,
@@ -107,4 +120,58 @@ class _HeaderIconButton extends StatelessWidget {
       ),
     );
   }
+}
+
+void _showAbout(BuildContext context) {
+  showDialog<void>(
+    context: context,
+    builder: (context) => AlertDialog(
+      icon: const Icon(Icons.auto_awesome_rounded, size: 34),
+      title: const Text('درباره هاوژین'),
+      content: const Text(
+        'هاوژین همراهی ساده برای یادداشت‌ها، مدیریت مالی، اطلاعات دم‌دستی و برچسب‌های کارهاست. هدف ما کمک به نظم روزمره، با رابطی فارسی و تجربه‌ای آرام است.',
+        textAlign: TextAlign.start,
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('بستن')),
+      ],
+    ),
+  );
+}
+
+void _showDonation(BuildContext context) {
+  showDialog<void>(
+    context: context,
+    builder: (context) => AlertDialog(
+      icon: const Icon(Icons.favorite_rounded, color: Color(0xFFE11D48), size: 36),
+      title: const Text('حمایت از توسعه‌دهنده'),
+      content: const SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('اگر هاوژین برایت مفید است، حمایت تو کمک می‌کند توسعه و بهبود آن ادامه پیدا کند.'),
+            SizedBox(height: 12),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.share_outlined),
+              title: Text('معرفی به دوستان'),
+              subtitle: Text('یکی از ساده‌ترین راه‌های حمایت، معرفی برنامه به کسانی است که به آن نیاز دارند.'),
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.feedback_outlined),
+              title: Text('ارسال بازخورد'),
+              subtitle: Text('پیشنهادها و گزارش خطاها کمک می‌کنند وقت توسعه صرف بهبودهای واقعی شود.'),
+            ),
+            SizedBox(height: 4),
+            Text('در نسخه فعلی، پرداخت مستقیم درون‌برنامه‌ای تنظیم نشده است؛ بنابراین این بخش هیچ پرداختی انجام نمی‌دهد.'),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('متوجه شدم')),
+      ],
+    ),
+  );
 }
