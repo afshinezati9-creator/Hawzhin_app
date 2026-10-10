@@ -52,19 +52,19 @@ jobs:
       - name: Configure release signing if secrets exist
         id: signing
         env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         shell: bash
         run: |
-          if [[ -n "$ANDROID_KEYSTORE_BASE64" && -n "$ANDROID_KEY_ALIAS" && -n "$ANDROID_KEY_PASSWORD" && -n "$ANDROID_STORE_PASSWORD" ]]; then
-            echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/upload-keystore.jks
+          if [[ -n "$KEYSTORE_BASE64" && -n "$KEY_ALIAS" && -n "$KEY_PASSWORD" && -n "$KEYSTORE_PASSWORD" ]]; then
+            echo "$KEYSTORE_BASE64" | base64 --decode > android/app/upload-keystore.jks
             cat > android/key.properties <<EOF
           storeFile=upload-keystore.jks
-          storePassword=$ANDROID_STORE_PASSWORD
-          keyAlias=$ANDROID_KEY_ALIAS
-          keyPassword=$ANDROID_KEY_PASSWORD
+          storePassword=$KEYSTORE_PASSWORD
+          keyAlias=$KEY_ALIAS
+          keyPassword=$KEY_PASSWORD
           EOF
             echo "store_signed=true" >> "$GITHUB_OUTPUT"
           else
