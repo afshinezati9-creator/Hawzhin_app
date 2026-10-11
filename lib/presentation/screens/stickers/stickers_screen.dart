@@ -9,9 +9,30 @@ import '../../../domain/entities/sticker_entities.dart';
 import '../../providers/stickers_provider.dart';
 import 'sticker_note_card.dart';
 import 'surface_background.dart';
+import '../../../core/security/secure_storage_service.dart';
 
-/// انتخاب تعداد ستون‌ها برای شبکهٔ برچسب‌ها.
-final stickerGridColumnsProvider = StateProvider<int>((ref) => 2);
+/// انتخاب تعداد ستون‌ها؛ مقدار انتخابی بین اجراهای برنامه حفظ می‌شود.
+final stickerGridColumnsProvider =
+    StateNotifierProvider<StickerGridColumnsNotifier, int>(
+  (ref) => StickerGridColumnsNotifier(),
+);
+
+class StickerGridColumnsNotifier extends StateNotifier<int> {
+  StickerGridColumnsNotifier() : super(2) {
+    _load();
+  }
+
+  Future<void> _load() async {
+    final saved = await SecureStorageService.instance.getStickerGridColumns();
+    if (mounted) state = saved;
+  }
+
+  Future<void> setColumns(int columns) async {
+    if (columns != 2 && columns != 3) return;
+    state = columns;
+    await SecureStorageService.instance.saveStickerGridColumns(columns);
+  }
+}
 
 TextDirection _directionForText(String text) {
   for (final rune in text.runes) {
@@ -880,7 +901,7 @@ class StickersScreen extends ConsumerWidget {
                 icon: const Icon(Icons.grid_view_rounded),
                 initialValue: gridColumns,
                 onSelected: (columns) =>
-                    ref.read(stickerGridColumnsProvider.notifier).state = columns,
+                    ref.read(stickerGridColumnsProvider.notifier).setColumns(columns),
                 itemBuilder: (_) => const [
                   PopupMenuItem(value: 2, child: Text('۲ ستون')),
                   PopupMenuItem(value: 3, child: Text('۳ ستون')),
