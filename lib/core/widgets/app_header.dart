@@ -3,6 +3,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
 import '../constants/app_constants.dart';
 import '../../presentation/widgets/nozhin_logo.dart';
+import '../../presentation/screens/settings/settings_screen.dart';
 
 class AppHeader extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onThemeToggle;
@@ -54,7 +55,9 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
           const SizedBox(width: 6),
           _HeaderIconButton(
             icon: Icons.info_outline_rounded,
-            onTap: () => _showAbout(context),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const SettingsScreen()),
+            ),
           ),
           const Spacer(),
           Row(
@@ -114,19 +117,3 @@ class _HeaderIconButton extends StatelessWidget {
   }
 }
 
-void _showAbout(BuildContext context) {
-  showDialog<void>(
-    context: context,
-    builder: (context) => AlertDialog(
-      icon: const Icon(Icons.auto_awesome_rounded, size: 34),
-      title: const Text('درباره هاوژین'),
-      content: const Text(
-        'هاوژین همراهی ساده برای یادداشت‌ها، مدیریت مالی، اطلاعات دم‌دستی و برچسب‌های کارهاست. هدف ما کمک به نظم روزمره، با رابطی فارسی و تجربه‌ای آرام است.',
-        textAlign: TextAlign.start,
-      ),
-      actions: [
-        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('بستن')),
-      ],
-    ),
-  );
-}
