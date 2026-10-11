@@ -1216,7 +1216,17 @@ class _ChecklistSheetState extends ConsumerState<_ChecklistSheet> {
                 OutlinedButton.icon(
                   onPressed: () async {
                     final picked = await showShamsiDatePicker(ctx, initial: dueDate ?? DateTime.now());
-                    if (picked != null) setLocal(() => dueDate = picked);
+                    if (picked == null || !ctx.mounted) return;
+                    final time = await showTimePicker(
+                      context: ctx,
+                      initialTime: TimeOfDay.fromDateTime(dueDate ?? DateTime.now()),
+                      helpText: 'انتخاب ساعت مهلت',
+                    );
+                    setLocal(() => dueDate = DateTime(
+                      picked.year, picked.month, picked.day,
+                      time?.hour ?? dueDate?.hour ?? 23,
+                      time?.minute ?? dueDate?.minute ?? 59,
+                    ));
                   },
                   icon: const Icon(Icons.event_outlined),
                   label: Text(dueDate == null ? 'افزودن تاریخ شمسی (اختیاری)' : 'مهلت: ${Jalali.fromDateTime(dueDate!).format(withMonthName: true)} · ${TimeOfDay.fromDateTime(dueDate!).format(ctx)}'),
