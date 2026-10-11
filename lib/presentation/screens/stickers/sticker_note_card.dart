@@ -211,19 +211,55 @@ class StickerNoteCard extends StatelessWidget {
                           style: TextStyle(fontSize: 11, color: muted),
                         ),
                       if (note.dueDate != null) ...[
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Icon(Icons.event_outlined, size: 12, color: muted),
-                            const SizedBox(width: 4),
-                            Expanded(child: Text(
-                              Jalali.fromDateTime(note.dueDate!).format(withMonthName: true),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontSize: 10, color: muted),
-                            )),
-                          ],
-                        ),
+                        const SizedBox(height: 6),
+                        Builder(builder: (context) {
+                          final now = DateTime.now();
+                          final overdue = !note.done &&
+                              note.dueDate!.isBefore(now);
+                          final dueSoon = !overdue &&
+                              !note.done &&
+                              note.dueDate!.difference(now).inHours < 24;
+                          final dueColor = overdue
+                              ? const Color(0xFFDC2626)
+                              : dueSoon
+                                  ? const Color(0xFFD97706)
+                                  : muted;
+                          return Align(
+                            alignment: Alignment.centerLeft,
+                            child: Container(
+                              constraints: const BoxConstraints(maxWidth: double.infinity),
+                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: dueColor.withOpacity(0.10),
+                                borderRadius: BorderRadius.circular(7),
+                                border: Border.all(color: dueColor.withOpacity(0.22)),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    overdue ? Icons.warning_amber_rounded : Icons.schedule_rounded,
+                                    size: 12,
+                                    color: dueColor,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Flexible(
+                                    child: Text(
+                                      '${Jalali.fromDateTime(note.dueDate!).format(withMonthName: true)} · ${TimeOfDay.fromDateTime(note.dueDate!).format(context)}',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w700,
+                                        color: dueColor,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }),
                       ],
                       const Spacer(),
                       Text(
