@@ -225,80 +225,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 },
               ),
 
-              FutureBuilder<bool>(
-                future: SecureStorageService.instance.getAppLockEnabled(),
-                builder: (context, snap) {
-                  final pinOn = snap.data ?? false;
-                  return FutureBuilder<bool>(
-                    future: SecureStorageService.instance
-                        .getBiometricLockEnabled(),
-                    builder: (context, bioSnap) {
-                      final bioOn = bioSnap.data ?? false;
-                      return SwitchListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: const Text('باز شدن با اثر انگشت / چهره'),
-                        subtitle: Text(
-                          kIsWeb
-                              ? 'روی وب در دسترس نیست — فقط اندروید و iOS'
-                              : (!pinOn
-                                  ? 'اول قفل با PIN را فعال کن'
-                                  : (bioOn
-                                      ? 'فعال — ورود با اثرانگشت'
-                                      : 'اگر حسگر در دسترس نبود، به تنظیمات دسترسی‌ها می‌روی')),
-                        ),
-                        value: bioOn && pinOn && !kIsWeb,
-                        activeThumbColor: AppColors.brand3,
-                        onChanged: (kIsWeb || !pinOn)
-                            ? null
-                            : (v) async {
-                                if (v) {
-                                  final ok = await BiometricService.instance
-                                      .authenticate(
-                                    reason:
-                                        'برای فعال‌سازی اثرانگشت یک‌بار تأیید کن',
-                                    biometricOnly: false,
-                                  );
-                                  if (!ok) {
-                                    if (context.mounted) {
-                                      final go = await showDialog<bool>(
-                                        context: context,
-                                        builder: (ctx) => AlertDialog(
-                                          title: const Text('اثرانگشت فعال نشد'),
-                                          content: const Text(
-                                            'یا اثرانگشت روی گوشی ثبت نشده، یا دسترسی برنامه محدود است.\n\nمی‌خوای به تنظیمات دسترسی‌های هاوژین بروی؟',
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () =>
-                                                  Navigator.pop(ctx, false),
-                                              child: const Text('بعداً'),
-                                            ),
-                                            FilledButton(
-                                              onPressed: () =>
-                                                  Navigator.pop(ctx, true),
-                                              child: const Text('باز کردن تنظیمات'),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                      if (go == true) {
-                                        await BiometricService.instance
-                                            .openSystemAppSettings();
-                                      }
-                                    }
-                                    return;
-                                  }
-                                }
-                                await SecureStorageService.instance
-                                    .saveBiometricLockEnabled(v);
-                                if (context.mounted) setState(() {});
-                              },
-                      );
-                    },
-                  );
-                },
-              ),
-              // احراز هویت بیومتریک؛ تأیید نهایی را خود سیستم‌عامل نمایش می‌دهد.
+// احراز هویت بیومتریک؛ تأیید نهایی را خود سیستم‌عامل نمایش می‌دهد.
               FutureBuilder<bool>(
                 future: SecureStorageService.instance.getAppLockEnabled(),
                 builder: (context, snap) {
@@ -546,6 +473,36 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ),
                     ),
                     const SizedBox(height: 14),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.privacy_tip_outlined),
+                      title: const Text('سیاست حریم خصوصی'),
+                      subtitle: const Text('نحوهٔ ذخیره‌سازی داده‌ها، صدا و فایل‌های پشتیبان'),
+                      trailing: const Icon(Icons.open_in_new_rounded, size: 18),
+                      onTap: () async {
+                        final uri = Uri.parse(
+                          'https://github.com/afshinezati9-creator/Hawzhin_app/blob/main/PRIVACY_POLICY.md',
+                        );
+                        try {
+                          final opened = await launchUrl(
+                            uri,
+                            mode: LaunchMode.externalApplication,
+                          );
+                          if (!opened && context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('باز کردن لینک ممکن نشد.')),
+                            );
+                          }
+                        } catch (_) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('باز کردن لینک ممکن نشد.')),
+                            );
+                          }
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 8),
                     // سازنده
                     Container(
                       width: double.infinity,
