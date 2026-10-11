@@ -10,6 +10,9 @@ import '../../providers/stickers_provider.dart';
 import 'sticker_note_card.dart';
 import 'surface_background.dart';
 
+/// انتخاب تعداد ستون‌ها برای شبکهٔ برچسب‌ها.
+final stickerGridColumnsProvider = StateProvider<int>((ref) => 2);
+
 TextDirection _directionForText(String text) {
   for (final rune in text.runes) {
     if ((rune >= 0x0600 && rune <= 0x06FF) ||
@@ -846,6 +849,7 @@ class StickersScreen extends ConsumerWidget {
       }
     });
     final state = ref.watch(stickersProvider);
+    final gridColumns = ref.watch(stickerGridColumnsProvider);
     final theme = Theme.of(context);
 
     if (state.isLoading && state.surfaces.isEmpty) {
@@ -871,6 +875,17 @@ class StickersScreen extends ConsumerWidget {
                     ?.copyWith(fontWeight: FontWeight.w900),
               ),
               const Spacer(),
+              PopupMenuButton<int>(
+                tooltip: 'چیدمان برچسب‌ها',
+                icon: const Icon(Icons.grid_view_rounded),
+                initialValue: gridColumns,
+                onSelected: (columns) =>
+                    ref.read(stickerGridColumnsProvider.notifier).state = columns,
+                itemBuilder: (_) => const [
+                  PopupMenuItem(value: 2, child: Text('۲ ستون')),
+                  PopupMenuItem(value: 3, child: Text('۳ ستون')),
+                ],
+              ),
               IconButton(
                 tooltip: 'مدیریت سطوح',
                 onPressed: () => _manageSurfaces(context, ref),
@@ -1013,11 +1028,11 @@ class StickersScreen extends ConsumerWidget {
                           })
                         : GridView.builder(
                             gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: gridColumns,
                               mainAxisSpacing: 10,
                               crossAxisSpacing: 10,
-                              childAspectRatio: 0.85,
+                              childAspectRatio: gridColumns == 3 ? 0.68 : 0.85,
                             ),
                             itemCount: notes.length +
                                 (notes.length < 9 ? 1 : 0),
