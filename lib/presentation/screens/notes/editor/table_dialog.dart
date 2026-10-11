@@ -28,6 +28,8 @@ class _TableInsertDialogState extends State<TableInsertDialog> {
   double _colWidth = 100;
   int? _focusR;
   int? _focusC;
+  late final TextEditingController _cellInputCtrl = TextEditingController();
+  bool _syncingCellInput = false;
   bool _headerRow = true;
   bool _altRows = true;
   bool _showGrid = true;
@@ -97,7 +99,28 @@ class _TableInsertDialogState extends State<TableInsertDialog> {
         c.dispose();
       }
     }
+    _cellInputCtrl.dispose();
     super.dispose();
+  }
+
+  void _selectCell(int r, int c) {
+    _focusR = r;
+    _focusC = c;
+    _syncingCellInput = true;
+    _cellInputCtrl.value = TextEditingValue(
+      text: cells[r][c].text,
+      selection: TextSelection.collapsed(offset: cells[r][c].text.length),
+    );
+    _syncingCellInput = false;
+  }
+
+  void _editSelectedCell(String value) {
+    if (_syncingCellInput || _focusR == null || _focusC == null) return;
+    cells[_focusR!][_focusC!].value = TextEditingValue(
+      text: value,
+      selection: TextSelection.collapsed(offset: value.length),
+    );
+    setState(() {});
   }
 
   Map<String, dynamic> toData() {
@@ -154,6 +177,7 @@ class _TableInsertDialogState extends State<TableInsertDialog> {
     final c = _focusC!;
     // فرمول خام برای ذخیره
     cells[r][c].text = '=$kind';
+    _selectCell(r, c);
     setState(() {});
   }
 
@@ -238,108 +262,6 @@ class _TableInsertDialogState extends State<TableInsertDialog> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
 
-            // تنظیمات بیشتر اکسل
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(10),
-              margin: const EdgeInsets.only(bottom: 8),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: theme.colorScheme.outline),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('تنظیمات جدول',
-                      style: theme.textTheme.titleSmall
-                          ?.copyWith(fontWeight: FontWeight.w800)),
-                  const SizedBox(height: 6),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 4,
-                    children: [
-                      FilterChip(
-                        label: const Text('ردیف عنوان'),
-                        selected: _headerRow,
-                        onSelected: (v) => setState(() => _headerRow = v),
-                      ),
-                      FilterChip(
-                        label: const Text('ردیف راه‌راه'),
-                        selected: _altRows,
-                        onSelected: (v) => setState(() => _altRows = v),
-                      ),
-                      FilterChip(
-                        label: const Text('نمایش خطوط'),
-                        selected: _showGrid,
-                        onSelected: (v) => setState(() => _showGrid = v),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Text('عرض ستون: ${_colWidth.round()}',
-                      style: theme.textTheme.labelSmall),
-                  Slider(
-                    value: _colWidth.clamp(60, 180),
-                    min: 60,
-                    max: 180,
-                    divisions: 12,
-                    label: '${_colWidth.round()}',
-                    onChanged: (v) => setState(() => _colWidth = v),
-                  ),
-                  Row(
-                    children: [
-                      Text('سطر ${rows}', style: theme.textTheme.labelMedium),
-                      IconButton(
-                        icon: const Icon(Icons.remove_circle_outline),
-                        onPressed: rows > 2
-                            ? () => setState(() {
-                                  rows--;
-                                  _rebuild(keepData: true);
-                                })
-                            : null,
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.add_circle_outline),
-                        onPressed: rows < _maxRows
-                            ? () => setState(() {
-                                  rows++;
-                                  _rebuild(keepData: true);
-                                })
-                            : null,
-                      ),
-                      const SizedBox(width: 8),
-                      Text('ستون ${cols}', style: theme.textTheme.labelMedium),
-                      IconButton(
-                        icon: const Icon(Icons.remove_circle_outline),
-                        onPressed: cols > 2
-                            ? () => setState(() {
-                                  cols--;
-                                  _rebuild(keepData: true);
-                                })
-                            : null,
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.add_circle_outline),
-                        onPressed: cols < _maxCols
-                            ? () => setState(() {
-                                  cols++;
-                                  _rebuild(keepData: true);
-                                })
-                            : null,
-                      ),
-                    ],
-                  ),
-                  Text(
-                    'فرمول: روی سلول کلیک کن، SUM/AVG/MIN/MAX بزن، بعد «محاسبه». یا بنویس =10+5',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.55),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
               Row(
                 children: [
                   Container(
@@ -374,24 +296,6 @@ class _TableInsertDialogState extends State<TableInsertDialog> {
                     ),
                   ),
                 ],
-              ),
-              const SizedBox(height: 10),
-
-              // راهنما
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppColors.brand3.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.brand3.withOpacity(0.2)),
-                ),
-                child: Text(
-                  '۱) روی سلول کلیک کن و بنویس\n'
-                  '۲) برای فرمول: سلول را انتخاب کن → SUM / AVG / ...\n'
-                  '۳) «محاسبه فرمول‌ها» را بزن تا نتیجه جای فرمول بنشیند\n'
-                  '۴) عرض و تعداد سطر/ستون را از پایین تنظیم کن',
-                  style: theme.textTheme.bodySmall?.copyWith(height: 1.45),
-                ),
               ),
               const SizedBox(height: 10),
 
@@ -520,6 +424,53 @@ class _TableInsertDialogState extends State<TableInsertDialog> {
               ),
               const SizedBox(height: 8),
 
+              // نوار ورود اطلاعات همگام با خانه انتخاب‌شده
+              Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: _focusR != null ? AppColors.brand3 : theme.colorScheme.outline),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      constraints: const BoxConstraints(minWidth: 38),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: AppColors.brand3.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        _focusR == null || _focusC == null
+                            ? 'سلول'
+                            : '${String.fromCharCode(65 + _focusC!)}${_focusR! + 1}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontWeight: FontWeight.w800, color: AppColors.brand3),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Icon(Icons.functions_rounded, size: 18),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TextField(
+                        controller: _cellInputCtrl,
+                        enabled: _focusR != null,
+                        onChanged: _editSelectedCell,
+                        minLines: 1,
+                        maxLines: 2,
+                        decoration: InputDecoration(
+                          hintText: _focusR == null ? 'ابتدا یک خانه از جدول انتخاب کن' : 'محتوای خانه انتخاب‌شده یا فرمول…',
+                          border: InputBorder.none,
+                          isDense: true,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
               // جدول
               Expanded(
                 child: Container(
@@ -528,12 +479,14 @@ class _TableInsertDialogState extends State<TableInsertDialog> {
                     border: Border.all(color: theme.colorScheme.outline),
                   ),
                   clipBehavior: Clip.antiAlias,
-                  child: InteractiveViewer(
-                    constrained: false,
-                    boundaryMargin: const EdgeInsets.all(48),
-                    minScale: 0.6,
-                    maxScale: 2.5,
-                    child: Table(
+                  child: Scrollbar(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        physics: const BouncingScrollPhysics(),
+                        child: Table(
                       border: TableBorder.all(
                           color: theme.colorScheme.outline, width: 1),
                       defaultColumnWidth: FixedColumnWidth(_colWidth),
@@ -569,10 +522,17 @@ class _TableInsertDialogState extends State<TableInsertDialog> {
                                 maxLines: null,
                                 minLines: 1,
                                 textAlign: TextAlign.center,
-                                onTap: () => setState(() {
-                                  _focusR = r;
-                                  _focusC = c;
-                                }),
+                                onTap: () => setState(() => _selectCell(r, c)),
+                                onChanged: (value) {
+                                  if (_focusR == r && _focusC == c && !_syncingCellInput) {
+                                    _syncingCellInput = true;
+                                    _cellInputCtrl.value = TextEditingValue(
+                                      text: value,
+                                      selection: TextSelection.collapsed(offset: value.length),
+                                    );
+                                    _syncingCellInput = false;
+                                  }
+                                },
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   fontWeight: isHeader
                                       ? FontWeight.w800
@@ -590,6 +550,8 @@ class _TableInsertDialogState extends State<TableInsertDialog> {
                           }),
                         );
                       }),
+                        ),
+                      ),
                     ),
                   ),
                 ),
