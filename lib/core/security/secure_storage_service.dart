@@ -24,6 +24,7 @@ class SecureStorageService {
   static const _keyIsFirstLaunch = 'is_first_launch';
   static const _keyNoteCategories = 'note_categories';
   static const _keyEncryptionKey = 'db_encryption_key';
+  static const _keyStickerGridColumns = 'sticker_grid_columns';
 
   Future<void> write(String key, String value) async {
     try {
@@ -100,6 +101,14 @@ class SecureStorageService {
       await write(_keyEncryptionKey, key);
     }
     return key;
+  }
+
+  Future<void> saveStickerGridColumns(int columns) =>
+      write(_keyStickerGridColumns, columns == 3 ? '3' : '2');
+
+  Future<int> getStickerGridColumns() async {
+    final value = await read(_keyStickerGridColumns);
+    return value == '3' ? 3 : 2;
   }
 
   Future<void> saveNoteCategories(String json) => write(_keyNoteCategories, json);
