@@ -10,6 +10,8 @@ import '../../providers/stickers_provider.dart';
 import 'sticker_note_card.dart';
 import 'surface_background.dart';
 
+final ValueNotifier<bool> _threeStickerColumns = ValueNotifier<bool>(false);
+
 TextDirection _directionForText(String text) {
   for (final rune in text.runes) {
     if ((rune >= 0x0600 && rune <= 0x06FF) ||
@@ -952,6 +954,20 @@ class StickersScreen extends ConsumerWidget {
                   onPressed: () => _addSurface(context, ref),
                 ),
               ),
+              ValueListenableBuilder<bool>(
+                valueListenable: _threeStickerColumns,
+                builder: (context, threeColumns, _) => Padding(
+                  padding: const EdgeInsets.only(left: 4),
+                  child: ActionChip(
+                    avatar: Icon(
+                      threeColumns ? Icons.view_agenda_outlined : Icons.grid_view_rounded,
+                      size: 16,
+                    ),
+                    label: Text(threeColumns ? 'دو ستون' : 'سه ستون'),
+                    onPressed: () => _threeStickerColumns.value = !threeColumns,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -1014,7 +1030,7 @@ class StickersScreen extends ConsumerWidget {
                         : GridView.builder(
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
+                              crossAxisCount: _threeStickerColumns.value ? 3 : 2,
                               mainAxisSpacing: 10,
                               crossAxisSpacing: 10,
                               childAspectRatio: 0.85,
