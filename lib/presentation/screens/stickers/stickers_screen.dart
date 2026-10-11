@@ -117,10 +117,27 @@ class StickersScreen extends ConsumerWidget {
                   OutlinedButton.icon(
                     onPressed: () async {
                       final picked = await showShamsiDatePicker(ctx, initial: dueDate ?? DateTime.now());
-                      if (picked != null) setLocal(() => dueDate = picked);
+                      if (picked == null || !ctx.mounted) return;
+                      final initialTime = TimeOfDay.fromDateTime(dueDate ?? DateTime.now());
+                      final time = await showTimePicker(
+                        context: ctx,
+                        initialTime: initialTime,
+                        helpText: 'انتخاب ساعت مهلت',
+                      );
+                      if (time != null) {
+                        setLocal(() => dueDate = DateTime(
+                          picked.year, picked.month, picked.day,
+                          time.hour, time.minute,
+                        ));
+                      } else {
+                        setLocal(() => dueDate = DateTime(
+                          picked.year, picked.month, picked.day,
+                          dueDate?.hour ?? 23, dueDate?.minute ?? 59,
+                        ));
+                      }
                     },
                     icon: const Icon(Icons.event_outlined),
-                    label: Text(dueDate == null ? 'افزودن تاریخ شمسی (اختیاری)' : 'مهلت: ${Jalali.fromDateTime(dueDate!).format(withMonthName: true)}'),
+                    label: Text(dueDate == null ? 'افزودن تاریخ شمسی (اختیاری)' : 'مهلت: ${Jalali.fromDateTime(dueDate!).format(withMonthName: true)} · ${TimeOfDay.fromDateTime(dueDate!).format(ctx)}'),
                   ),
                   if (dueDate != null)
                     Align(alignment: Alignment.centerLeft, child: TextButton.icon(
@@ -1202,7 +1219,7 @@ class _ChecklistSheetState extends ConsumerState<_ChecklistSheet> {
                     if (picked != null) setLocal(() => dueDate = picked);
                   },
                   icon: const Icon(Icons.event_outlined),
-                  label: Text(dueDate == null ? 'افزودن تاریخ شمسی (اختیاری)' : 'مهلت: ${Jalali.fromDateTime(dueDate!).format(withMonthName: true)}'),
+                  label: Text(dueDate == null ? 'افزودن تاریخ شمسی (اختیاری)' : 'مهلت: ${Jalali.fromDateTime(dueDate!).format(withMonthName: true)} · ${TimeOfDay.fromDateTime(dueDate!).format(ctx)}'),
                 ),
                 if (dueDate != null)
                   Align(alignment: Alignment.centerLeft, child: TextButton.icon(
