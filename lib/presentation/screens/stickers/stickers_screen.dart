@@ -1027,10 +1027,12 @@ class StickersScreen extends ConsumerWidget {
                               ),
                             );
                           })
-                        : GridView.builder(
+                        : ValueListenableBuilder<bool>(
+                            valueListenable: _threeStickerColumns,
+                            builder: (context, threeColumns, _) => GridView.builder(
                             gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: _threeStickerColumns.value ? 3 : 2,
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: threeColumns ? 3 : 2,
                               mainAxisSpacing: 10,
                               crossAxisSpacing: 10,
                               childAspectRatio: 0.85,
@@ -1118,6 +1120,7 @@ class StickersScreen extends ConsumerWidget {
                                 },
                               );
                             },
+                          ),
                           ),
                   ),
                 ),
