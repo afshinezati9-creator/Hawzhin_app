@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -92,10 +94,8 @@ class SecureStorageService {
   Future<String?> getOrCreateEncryptionKey() async {
     var key = await read(_keyEncryptionKey);
     if (key == null || key.isEmpty) {
-      final bytes = List<int>.generate(
-        32,
-        (i) => (DateTime.now().microsecondsSinceEpoch + i * 17) % 256,
-      );
+      final random = math.Random.secure();
+      final bytes = List<int>.generate(32, (_) => random.nextInt(256));
       key = bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
       await write(_keyEncryptionKey, key);
     }
