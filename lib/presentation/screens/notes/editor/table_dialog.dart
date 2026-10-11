@@ -177,6 +177,7 @@ class _TableInsertDialogState extends State<TableInsertDialog> {
     final c = _focusC!;
     // فرمول خام برای ذخیره
     cells[r][c].text = '=$kind';
+    _selectCell(r, c);
     setState(() {});
   }
 
@@ -478,12 +479,14 @@ class _TableInsertDialogState extends State<TableInsertDialog> {
                     border: Border.all(color: theme.colorScheme.outline),
                   ),
                   clipBehavior: Clip.antiAlias,
-                  child: InteractiveViewer(
-                    constrained: false,
-                    boundaryMargin: const EdgeInsets.all(48),
-                    minScale: 0.6,
-                    maxScale: 2.5,
-                    child: Table(
+                  child: Scrollbar(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        physics: const BouncingScrollPhysics(),
+                        child: Table(
                       border: TableBorder.all(
                           color: theme.colorScheme.outline, width: 1),
                       defaultColumnWidth: FixedColumnWidth(_colWidth),
@@ -547,6 +550,8 @@ class _TableInsertDialogState extends State<TableInsertDialog> {
                           }),
                         );
                       }),
+                        ),
+                      ),
                     ),
                   ),
                 ),
