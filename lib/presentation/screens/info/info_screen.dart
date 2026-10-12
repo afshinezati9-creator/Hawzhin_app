@@ -311,16 +311,23 @@ class _InfoTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Material(
-        color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(14),
+        color: theme.colorScheme.surface,
+        elevation: theme.brightness == Brightness.dark ? 0 : 1,
+        shadowColor: Colors.black.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(16),
         child: InkWell(
           onTap: onCopy,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(16),
           child: Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: theme.colorScheme.outline),
+              color: theme.colorScheme.surfaceContainerHighest.withOpacity(
+                theme.brightness == Brightness.dark ? 0.48 : 0.42,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: theme.colorScheme.outline.withOpacity(0.55),
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
