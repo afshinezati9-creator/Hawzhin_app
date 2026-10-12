@@ -532,6 +532,7 @@ class _TableInsertDialogState extends State<TableInsertDialog> {
                                 textAlign: TextAlign.center,
                                 onTap: () => setState(() => _selectCell(r, c)),
                                 onChanged: (value) {
+                                  _formulaResults.clear();
                                   if (_focusR == r && _focusC == c && !_syncingCellInput) {
                                     _syncingCellInput = true;
                                     _cellInputCtrl.value = TextEditingValue(
