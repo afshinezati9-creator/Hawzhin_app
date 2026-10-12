@@ -431,29 +431,35 @@ class _LockScreenState extends State<LockScreen>
                     ),
                     child: Directionality(
                     textDirection: TextDirection.ltr,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(10, (i) {
-                        final filled = i < _pin.length;
-                        return AnimatedContainer(
-                          duration: const Duration(milliseconds: 120),
-                          width: filled ? 16 : 14,
-                          height: filled ? 16 : 14,
-                          margin: const EdgeInsets.symmetric(horizontal: 8),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: filled
-                                ? AppColors.brand3
-                                : Colors.transparent,
-                            border: Border.all(
-                              color: filled
-                                  ? AppColors.brand3
-                                  : theme.colorScheme.outline.withOpacity(0.45),
-                              width: 2,
-                            ),
-                          ),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final dotSize = (constraints.maxWidth / 22).clamp(8.0, 16.0);
+                        final gap = (constraints.maxWidth / 70).clamp(2.0, 8.0);
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(10, (i) {
+                            final filled = i < _pin.length;
+                            return AnimatedContainer(
+                              duration: const Duration(milliseconds: 120),
+                              width: dotSize,
+                              height: dotSize,
+                              margin: EdgeInsets.symmetric(horizontal: gap),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: filled
+                                    ? AppColors.brand3
+                                    : Colors.transparent,
+                                border: Border.all(
+                                  color: filled
+                                      ? AppColors.brand3
+                                      : theme.colorScheme.outline.withOpacity(0.45),
+                                  width: 2,
+                                ),
+                              ),
+                            );
+                          }),
                         );
-                      }),
+                      },
                     ),
                       ),
                   ),
