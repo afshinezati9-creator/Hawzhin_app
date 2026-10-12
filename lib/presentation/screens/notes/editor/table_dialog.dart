@@ -72,6 +72,7 @@ class _TableInsertDialogState extends State<TableInsertDialog> {
         ? cells.map((r) => r.map((c) => c.text).toList()).toList()
         : <List<String>>[];
 
+    _formulaResults.clear();
     if (keepData) {
       for (final row in cells) {
         for (final c in row) {
@@ -179,7 +180,8 @@ class _TableInsertDialogState extends State<TableInsertDialog> {
     }
     final r = _focusR!;
     final c = _focusC!;
-    // فرمول خام برای ذخیره
+    _formulaResults.remove(_cellKey(r, c));
+    // فرمول خام برای ذخیره؛ نتیجه در حافظه جداگانه نگهداری می‌شود.
     cells[r][c].text = '=$kind';
     _selectCell(r, c);
     setState(() {});
@@ -532,7 +534,7 @@ class _TableInsertDialogState extends State<TableInsertDialog> {
                                 textAlign: TextAlign.center,
                                 onTap: () => setState(() => _selectCell(r, c)),
                                 onChanged: (value) {
-                                  _formulaResults.clear();
+                                  _formulaResults.remove(_cellKey(r, c));
                                   if (_focusR == r && _focusC == c && !_syncingCellInput) {
                                     _syncingCellInput = true;
                                     _cellInputCtrl.value = TextEditingValue(
