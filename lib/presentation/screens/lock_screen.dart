@@ -433,8 +433,8 @@ class _LockScreenState extends State<LockScreen>
                     textDirection: TextDirection.ltr,
                     child: LayoutBuilder(
                       builder: (context, constraints) {
-                        final dotSize = (constraints.maxWidth / 22).clamp(8.0, 16.0);
-                        final gap = (constraints.maxWidth / 70).clamp(2.0, 8.0);
+                        final dotSize = (constraints.maxWidth / 22).clamp(8.0, 16.0).toDouble();
+                        final gap = (constraints.maxWidth / 70).clamp(2.0, 8.0).toDouble();
                         return Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: List.generate(10, (i) {
