@@ -30,6 +30,9 @@ class _TableInsertDialogState extends State<TableInsertDialog> {
   int? _focusC;
   late final TextEditingController _cellInputCtrl = TextEditingController();
   bool _syncingCellInput = false;
+  final Map<String, String> _formulaResults = {};
+
+  String _cellKey(int r, int c) => '$r:$c';
   bool _headerRow = true;
   bool _altRows = true;
   bool _showGrid = true;
@@ -116,6 +119,7 @@ class _TableInsertDialogState extends State<TableInsertDialog> {
 
   void _editSelectedCell(String value) {
     if (_syncingCellInput || _focusR == null || _focusC == null) return;
+    _formulaResults.remove(_cellKey(_focusR!, _focusC!));
     cells[_focusR!][_focusC!].value = TextEditingValue(
       text: value,
       selection: TextSelection.collapsed(offset: value.length),
@@ -182,6 +186,7 @@ class _TableInsertDialogState extends State<TableInsertDialog> {
   }
 
   void _computeAllFormulas() {
+    _formulaResults.clear();
     for (var r = 0; r < rows; r++) {
       for (var c = 0; c < cols; c++) {
         final t = cells[r][c].text.trim();
@@ -230,8 +235,8 @@ class _TableInsertDialogState extends State<TableInsertDialog> {
             continue;
           }
         }
-        // نگه داشتن فرمول در tooltip-like: ذخیره نتیجه با یادداشت فرمول
-        cells[r][c].text = result;
+        // نتیجه جدا از فرمول نگهداری می‌شود تا فرمول هنگام ذخیره از بین نرود.
+        _formulaResults[_cellKey(r, c)] = result;
       }
     }
     setState(() {});
@@ -517,7 +522,10 @@ class _TableInsertDialogState extends State<TableInsertDialog> {
                                 minHeight: isHeader ? 36 : 44,
                                 minWidth: _colWidth,
                               ),
-                              child: TextField(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  TextField(
                                 controller: cells[r][c],
                                 maxLines: null,
                                 minLines: 1,
@@ -545,6 +553,19 @@ class _TableInsertDialogState extends State<TableInsertDialog> {
                                   contentPadding: EdgeInsets.symmetric(
                                       horizontal: 6, vertical: 10),
                                 ),
+                                  ),
+                                  if (_formulaResults.containsKey(_cellKey(r, c)))
+                                    Padding(
+                                      padding: const EdgeInsets.only(bottom: 5),
+                                      child: Text(
+                                        'نتیجه: ${_formulaResults[_cellKey(r, c)]}',
+                                        style: theme.textTheme.labelSmall?.copyWith(
+                                          color: AppColors.brand3,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                    ),
+                                ],
                               ),
                             );
                           }),
